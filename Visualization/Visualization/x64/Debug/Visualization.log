@@ -1,19 +1,20 @@
-﻿  main.cpp
+﻿  VisualModel.cpp
 c:\program_environment\opencv3\install\include\opencv2\core\mat.hpp(1926): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
 c:\program_environment\opencv3\install\include\opencv2\core\persistence.hpp : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
 c:\program_environment\opencv3\install\include\opencv2\core\utility.hpp : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
 c:\program_environment\opencv3\install\include\opencv2\core\utility.hpp : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
 c:\program_environment\opencv3\install\include\opencv2\imgproc.hpp(617): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
-e:\github\driveenhance_visualization\visualization\visualization\main.cpp(13): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-e:\github\driveenhance_visualization\visualization\visualization\main.cpp(47): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-e:\github\driveenhance_visualization\visualization\visualization\main.cpp(84): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-e:\github\driveenhance_visualization\visualization\visualization\main.cpp(118): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
-e:\github\driveenhance_visualization\visualization\visualization\main.cpp(128): warning C4244: “=”: 从“float”转换到“int”，可能丢失数据
-e:\github\driveenhance_visualization\visualization\visualization\main.cpp(132): warning C4244: “=”: 从“float”转换到“int”，可能丢失数据
-e:\github\driveenhance_visualization\visualization\visualization\main.cpp(133): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
-e:\github\driveenhance_visualization\visualization\visualization\main.cpp(143): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
-e:\github\driveenhance_visualization\visualization\visualization\main.cpp(151): warning C4244: “=”: 从“float”转换到“int”，可能丢失数据
-e:\github\driveenhance_visualization\visualization\visualization\main.cpp(156): warning C4244: “=”: 从“float”转换到“int”，可能丢失数据
-e:\github\driveenhance_visualization\visualization\visualization\main.cpp(158): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
+e:\github\driveenhance_visualization\visualization\visualization\visualmodel.cpp(11): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
+e:\github\driveenhance_visualization\visualization\visualization\visualmodel.cpp(12): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
+e:\github\driveenhance_visualization\visualization\visualization\visualmodel.cpp(13): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
+e:\github\driveenhance_visualization\visualization\visualization\visualmodel.cpp(24): warning C4244: “=”: 从“float”转换到“int”，可能丢失数据
+e:\github\driveenhance_visualization\visualization\visualization\visualmodel.cpp(27): warning C4244: “=”: 从“float”转换到“int”，可能丢失数据
+e:\github\driveenhance_visualization\visualization\visualization\visualmodel.cpp(30): warning C4244: “=”: 从“float”转换到“int”，可能丢失数据
+e:\github\driveenhance_visualization\visualization\visualization\visualmodel.cpp(33): warning C4244: “=”: 从“float”转换到“int”，可能丢失数据
+e:\github\driveenhance_visualization\visualization\visualization\visualmodel.cpp(44): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
+e:\github\driveenhance_visualization\visualization\visualization\visualmodel.cpp(49): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+e:\github\driveenhance_visualization\visualization\visualization\visualmodel.cpp(50): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+e:\github\driveenhance_visualization\visualization\visualization\visualmodel.cpp(53): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+e:\github\driveenhance_visualization\visualization\visualization\visualmodel.cpp(60): warning C4018: “>=”: 有符号/无符号不匹配
   Visualization.vcxproj -> E:\Github\DriveEnhance_Visualization\Visualization\x64\Debug\Visualization.exe
   Visualization.vcxproj -> E:\Github\DriveEnhance_Visualization\Visualization\x64\Debug\Visualization.pdb (Partial PDB)

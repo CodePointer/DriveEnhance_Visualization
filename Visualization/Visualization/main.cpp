@@ -1,231 +1,132 @@
-#include <opencv2/opencv.hpp>
-#include <iostream>
-#include <vector>
+//#include <al.h>
+//#include <alc.h>
+//#include <iostream>
+//#include <string>
+//#include <fstream>
+//#include <cstdio>
+//#include <Windows.h>
+#include "VisualModel.h"
 
-using namespace cv;
 using namespace std;
 
-const int MAT_RESOLUTION_HEIGHT = 800;
-const int MAT_RESOLUTION_WIDTH = 1280;
-
-Mat CreateLineMat(vector<Point2f> start_point, vector<Point2f>end_point)
+int endWithError(string msg, int error_code = 0)
 {
-	int line_num = start_point.size();
-
-	// Find the vanish point from line_1 and line_2
-	Point2f vanish_point;
-	float y1_1 = start_point[0].y;
-	float x1_1 = start_point[0].x;
-	float y2_1 = end_point[0].y;
-	float x2_1 = end_point[0].x;
-	float k_1 = (y2_1 - y1_1) / (x2_1 - x1_1);
-	float b_1 = y1_1 - k_1 * x1_1;
-	float y1_2 = start_point[1].y;
-	float x1_2 = start_point[1].x;
-	float y2_2 = end_point[1].y;
-	float x2_2 = end_point[1].x;
-	float k_2 = (y2_2 - y1_2) / (x2_2 - x1_2);
-	float b_2 = y1_2 - k_2 * x1_2;
-	vanish_point.x = -(b_2 - b_1) / (k_2 - k_1);
-	vanish_point.y = k_1 * vanish_point.x + b_1;
-
-	// Draw lines in the picture
-	Mat line_mat;
-	line_mat.create(Size(MAT_RESOLUTION_WIDTH, MAT_RESOLUTION_HEIGHT), CV_8UC3);
-	line_mat.setTo(0);
-	for (int idx = 0; idx < line_num; idx++)
-	{
-		line(line_mat, start_point[idx], vanish_point, CV_RGB(255, 0, 0), 5);
-	}
-
-	// Return result
-	return line_mat;
-}
-
-int LocateCarPosition(vector<Point2f> world_start_point, vector<Point2f> world_end_point)
-{
-	int line_num = world_start_point.size();
-
-	// Find line position
-	int car_position = 0;
-	for (int idx = 0; idx < line_num; idx++)
-	{
-		float x1 = world_start_point[idx].x;
-		float y1 = world_start_point[idx].y;
-		float x2 = world_end_point[idx].x;
-		float y2 = world_end_point[idx].y;
-		if (x1 == x2)
-		{
-			if (x1 > 0)
-			{
-				break;
-			}
-		}
-		else
-		{
-			float k = (y2 - y1) / (x2 - x1);
-			float b = y1 - k * x1;
-			if (-b / k > 0)
-				break;
-		}
-		car_position += 1;
-	}
-
-	return car_position;
-}
-
-Mat CreateSafeMat(vector<Point2f> start_point, 
-	vector<Point2f> end_point, 
-	vector<Point2f> car_location,
-	vector<float> car_size,
-	int car_position)
-{
-	// Set draw line
-	int line_num = start_point.size();
-	int car_left_num = car_position - 1;
-	int car_right_num = car_position + 1;
-
-	// Calculate lines function
-	vector<float> line_k;
-	vector<float> line_b;
-	for (int idx = 0; idx < line_num; idx++)
-	{
-		float x1 = start_point[idx].x;
-		float y1 = start_point[idx].y;
-		float x2 = end_point[idx].x;
-		float y2 = end_point[idx].y;
-		float k = (y2 - y1) / (x2 - x1);
-		float b = y1 - k * x1;
-		line_k.push_back(k);
-		line_b.push_back(b);
-	}
-
-	// Find the vanish point from line_1 and line_2
-	Point2f vanish_point;
-	vanish_point.x = -(line_b[1] - line_b[0]) / (line_k[1] - line_k[0]);
-	vanish_point.y = line_k[0] * vanish_point.x + line_b[0];
-
-	// Create safe mat
-	Mat safe_mat;
-	safe_mat.create(Size(MAT_RESOLUTION_WIDTH, MAT_RESOLUTION_HEIGHT), CV_8UC3);
-
-	// Draw left
-	if (car_left_num >= 0)
-	{
-		// Get safe valuation
-		Scalar safe_color = CV_RGB(255, 128, 128);
-
-		int start_h = vanish_point.y;
-		int end_h = MAT_RESOLUTION_HEIGHT;
-		for (int h = start_h; h < end_h; h++)
-		{
-			int start_w = 0;
-			int end_w = 0;
-			if (car_left_num > 0)
-			{
-				float b1 = line_b[car_left_num - 1];
-				float k1 = line_k[car_left_num - 1];
-				start_w = (h - b1) / k1;
-			}
-			float b2 = line_b[car_left_num];
-			float k2 = line_k[car_left_num];
-			end_w = (h - b2) / k2;
-			line(safe_mat, Point2f(start_w, h), Point2f(end_w, h), safe_color);
-		}
-	}
-
-	// Draw right
-	if (car_right_num <= line_num)
-	{
-		// Get safe valuation
-		Scalar safe_color = CV_RGB(128, 255, 128);
-
-		int start_h = vanish_point.y;
-		int end_h = MAT_RESOLUTION_HEIGHT;
-		for (int h = start_h; h < end_h; h++)
-		{
-			int start_w = 0;
-			int end_w = 0;
-			float b1 = line_b[car_right_num - 1];
-			float k1 = line_k[car_right_num - 1];
-			start_w = (h - b1) / k1;
-			if (car_right_num < line_num)
-			{
-				float b2 = line_b[car_right_num];
-				float k2 = line_k[car_right_num];
-				end_w = (h - b2) / k2;
-			}
-			line(safe_mat, Point2f(start_w, h), Point2f(end_w, h), safe_color);
-		}
-	}
-
-	return safe_mat;
-}
-
-Mat CreateDirectionMat(int direction_cmd)
-{
-	Mat direction_mat;
-	direction_mat.create(Size(MAT_RESOLUTION_WIDTH, MAT_RESOLUTION_HEIGHT), CV_8UC3);
-
-	return direction_mat;
+	cout << msg << endl;
+	system("PAUSE");
+	return error_code;
 }
 
 int main()
 {
-	// Input Background Image
-	Mat background_mat;
-	background_mat = imread("Background.png");
-
-	// Input line list
-	vector<Point2f> world_start_point;
-	vector<Point2f> world_end_point;
-	vector<Point2f> start_point;	// start from the edge
-	vector<Point2f> end_point;
-	start_point.push_back(Point2f(200.0, 800.0));
-	end_point.push_back(Point2f(640.0, 512.0));
-	start_point.push_back(Point2f(500.0, 800.0));
-	end_point.push_back(Point2f(640.0, 512.0));
-	start_point.push_back(Point2f(700.0, 800.0));
-	end_point.push_back(Point2f(640.0, 512.0));
-	start_point.push_back(Point2f(1000.0, 800.0));
-	end_point.push_back(Point2f(640.0, 512.0));
-
-	world_start_point.push_back(Point2f(-1.0, -1.0));
-	world_end_point.push_back(Point2f(-1.0, 1.0));
-	world_start_point.push_back(Point2f(-3.0, -1.0));
-	world_end_point.push_back(Point2f(-3.0, 1.0));
-	world_start_point.push_back(Point2f(1.0, -1.0));
-	world_end_point.push_back(Point2f(1.0, 1.0));
-	world_start_point.push_back(Point2f(3.0, -1.0));
-	world_end_point.push_back(Point2f(3.0, 1.0));
+	VisualModel vm;
 	
-	// Input car place
-	vector<Point2f> car_location;
-	vector<float> car_size;
+	// frame_mat input:
+	Mat background = imread("./background.png");
 
-	// Input direction command
-	int direction_cmd;
-	direction_cmd = 1; // 0,1,2
+	// video_name:
+	string video_name = "./test.avi";
+	string wav_name = "";
 
-	// Create line mat
-	Mat line_mat;
-	line_mat = CreateLineMat(start_point, end_point);
-
-	// Get car position
-	int car_position;
-	car_position = LocateCarPosition(world_start_point, world_end_point);
-
-	// Create safe mat
-	Mat safe_mat;
-	safe_mat = CreateSafeMat(start_point, end_point, car_location, car_size, car_position);
 	namedWindow("Test");
-	imshow("Test", safe_mat);
-	waitKey(0);
+	for (int idx = 0; idx < 500; idx++)
+	{
+		Point2f point_LU = Point2f(200.0 + idx % 100, 100.0 + idx % 100);
+		Point2f point_LD = Point2f(200.0 - idx % 100, 900.0 + idx % 100);
+		Point2f point_RD = Point2f(1100.0 + idx % 100, 900.0 - idx % 100);
+		Point2f point_RU = Point2f(1100.0 - idx % 100, 100 - idx % 100);
+		vector<Point2f> vertex_list;
+		vertex_list.push_back(point_LU);
+		vertex_list.push_back(point_LD);
+		vertex_list.push_back(point_RD);
+		vertex_list.push_back(point_RU);
+		vm.InputDataFile(true,
+			background,
+			vertex_list,
+			video_name);
+		Mat tmp;
+		tmp = vm.GetOutputMat();
+		imshow("Test", tmp);
+		waitKey(10);
+	}
+	destroyAllWindows();
 
-	// Create direction mat
-	Mat direction_mat;
-	direction_mat = CreateDirectionMat(direction_cmd);
+	// Read wave file
+	//FILE *fp = NULL;
+	//fp = fopen("./music.wav", "rb");
+	//char type[5];
+	//type[4] = '\0';
+	//DWORD size, chunkSize;
+	//short formatType, channels;
+	//DWORD sampleRate, avgBytesPerSec;
+	//short bytesPerSample, bitsPerSample;
+	//DWORD dataSize;
+	//fread(type, sizeof(char), 4, fp);
+	//if (string(type) != "RIFF") {
+	//	return endWithError("No RIFF");
+	//}
+	//fread(&size, sizeof(DWORD), 1, fp);
+	//fread(type, sizeof(char), 4, fp);
+	//if (string(type) != "WAVE") {
+	//	return endWithError("Not WAVE");
+	//}
+	//fread(type, sizeof(char), 4, fp);
+	//if (string(type) != "fmt ") {
+	//	return endWithError("not fmt ");
+	//}
+	//fread(&chunkSize, sizeof(DWORD), 1, fp);
+	//fread(&formatType, sizeof(short), 1, fp);
+	//fread(&channels, sizeof(short), 1, fp);
+	//fread(&sampleRate, sizeof(DWORD), 1, fp);
+	//fread(&avgBytesPerSec, sizeof(DWORD), 1, fp);
+	//fread(&bytesPerSample, sizeof(short), 1, fp);
+	//fread(&bitsPerSample, sizeof(short), 1, fp);
+	//fread(type, sizeof(char), 4, fp);
+	//if (string(type) != "data") {
+	//	return endWithError("Missing Data");
+	//}
+	//fread(&dataSize, sizeof(DWORD), 1, fp);
+	//unsigned char * music_buffer = new unsigned char[dataSize];
+	//fread(music_buffer, sizeof(BYTE), dataSize, fp);
+	//fclose(fp);
+
+	//// Initialize openal
+	//ALCdevice *device;
+	//ALCcontext *context;
+	//device = alcOpenDevice(NULL);
+	//if (!device) {
+	//	return endWithError("No sound device found");
+	//}
+	//context = alcCreateContext(device, NULL);
+	//alcMakeContextCurrent(context);
+	//if (!context) {
+	//	return endWithError("No sound context");
+	//}
+
+	//// generate source
+	//ALuint source;
+	//ALuint buffer;
+	//ALuint frequency = sampleRate;
+	//ALenum format = 0;
+	//alGenBuffers(1, &buffer);
+	//alGenSources(1, &source);
+	//if (bitsPerSample == 8) {
+	//	if (channels == 1) {
+	//		format = AL_FORMAT_MONO8;
+	//	}
+	//	else if (channels == 2) {
+	//		format = AL_FORMAT_STEREO8;
+	//	}
+	//}
+	//else if (bitsPerSample == 16) {
+	//	if (channels == 1) {
+	//		format = AL_FORMAT_MONO16;
+	//	}
+	//	else if (channels = 2) {
+	//		format = AL_FORMAT_STEREO16;
+	//	}
+	//}
+
+
 
 	return 0;
-
 }
