@@ -81,12 +81,21 @@ void VisualModel::LoadAviVideo(string video_name)
 	capture.release();
 }
 
-VisualModel::VisualModel()
+// VisualModel Construction Function
+// Parameters:
+//     video_name - string. The file name of the avi file.
+//     wav_name - not used.
+VisualModel::VisualModel(string video_name, string wav_name)
 {
 	this->frame_valid_flag_ = true;
 	this->frame_stamp_ = 0;
 	this->max_frame_num_ = 0;
 	this->video_frame_set_ = NULL;
+
+	this->LoadAviVideo(video_name);
+	//cout << "Load avi success." << endl;
+	PlaySound(wav_name.c_str(), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+	//cout << "Load wav success." << endl;
 }
 
 VisualModel::~VisualModel()
@@ -96,6 +105,8 @@ VisualModel::~VisualModel()
 		delete[]video_frame_set_;
 		this->video_frame_set_ = NULL;
 	}
+
+	PlaySound(NULL, NULL, SND_FILENAME);
 }
 
 // InputDataFile:
@@ -106,23 +117,12 @@ VisualModel::~VisualModel()
 //     vertex_list - a 4 point2f vector. The 4 vertex should be anti-clockwise, from the left-up point.
 //                   left-up, left-down, right-down, right-up
 //                   Coordinate: Point2f.x for width, Point2f.y for height.
-//     video_name - string. The file name of the avi file.
-//     wav_name - not used.
 int VisualModel::InputDataFile(bool frame_valid_flag,
 	Mat frame_mat,
-	vector<Point2f> vertex_list,
-	string video_name,
-	string wav_name)
+	vector<Point2f> vertex_list)
 {
 	if (frame_valid_flag) {
 		frame_mat.copyTo(this->frame_mat_);
-
-		// Check open the video or not
-		if (this->video_name_ != video_name) {
-			this->LoadAviVideo(video_name);
-		}
-
-		this->wav_name_ = wav_name;
 		this->GenerateVideoMat(vertex_list);
 	}
 	return 0;

@@ -18,14 +18,14 @@ int endWithError(string msg, int error_code = 0)
 
 int main()
 {
-	VisualModel vm;
+	// video_name:
+	string video_name = "./test.avi";
+	string wav_name = "./music.wav";
+
+	VisualModel vm(video_name, wav_name);
 	
 	// frame_mat input:
 	Mat background = imread("./background.png");
-
-	// video_name:
-	string video_name = "./test.avi";
-	string wav_name = "";
 
 	namedWindow("Test");
 	for (int idx = 0; idx < 500; idx++)
@@ -41,8 +41,7 @@ int main()
 		vertex_list.push_back(point_RU);
 		vm.InputDataFile(true,
 			background,
-			vertex_list,
-			video_name);
+			vertex_list);
 		Mat tmp;
 		tmp = vm.GetOutputMat();
 		imshow("Test", tmp);

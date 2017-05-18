@@ -3,6 +3,9 @@
 
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include <Windows.h>
+#include <mmsystem.h>
+#pragma comment(lib,"winmm.lib")
 
 using namespace cv;
 using namespace std;
@@ -25,14 +28,12 @@ private:
 	void LoadAviVideo(string video_name);
 
 public:
-	VisualModel();
+	VisualModel(string wav_name, string video_name);
 	~VisualModel();
 
 	int InputDataFile(bool frame_valid_flag,
 		Mat frame_mat = Mat(),
-		vector<Point2f> vertex_list = vector<Point2f>(),
-		string video_name = "",
-		string wav_name = "");
+		vector<Point2f> vertex_list = vector<Point2f>());
 	Mat GetOutputMat();
 };
 
